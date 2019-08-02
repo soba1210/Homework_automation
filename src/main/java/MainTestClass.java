@@ -65,8 +65,8 @@ public class MainTestClass {
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
-    private WebElement waitForElementAndClick(By by, String erroe_message, long timeInSeconds){
-        WebElement element = waitForElementPresent(by, erroe_message, timeInSeconds);
+    private WebElement waitForElementAndClick(By by, String error_message, long timeInSeconds){
+        WebElement element = waitForElementPresent(by, error_message, timeInSeconds);
         element.click();
         return element;
     }
