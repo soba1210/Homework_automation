@@ -38,13 +38,13 @@ public class MainTestClass {
     }
 
     @Test
-    public void testKeywordSearchPresence(){
+    public void testKeywordSearchPresence() {
 
         waitForElementAndClick(
                 By.id("search_container"),
                 "no search filed found",
                 5
-                );
+        );
         WebElement searchField = waitForElementPresent(
                 By.id("search_src_text"),
                 "",
@@ -58,17 +58,68 @@ public class MainTestClass {
                 keywordInSearchField);
     }
 
+    @Test
+    public void cancelSearchTest() {
 
-    private WebElement waitForElementPresent(By by, String error_message, long timeInSeconds){
+        waitForElementAndClick(
+                By.id("search_container"),
+                "no search filed found",
+                5
+        );
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "cannot find search field",
+                "Automation",
+                5
+        );
+
+        waitForElementPresent(
+                By.xpath("//android.widget.ListView/android.widget.LinearLayout[5]"),
+//                By.xpath("//*[@resource-id='page_list_item_container']//*[contains(@index,'4')]"),
+
+                "cannot find the fifth search result",
+                6
+        );
+        waitForElementAndClick(
+                By.xpath("//android.widget.ImageButton"),
+                "cannot find close search button",
+                5
+        );
+        waitForElementNotPresent(
+                By.id("search_close_btn"),
+                "close search button is still present",
+                6
+        );
+
+
+
+    }
+
+
+    private WebElement waitForElementPresent(By by, String error_message, long timeInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeInSeconds);
         wait.withMessage(error_message + "\n");
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
-    private WebElement waitForElementAndClick(By by, String error_message, long timeInSeconds){
+    private WebElement waitForElementAndClick(By by, String error_message, long timeInSeconds) {
         WebElement element = waitForElementPresent(by, error_message, timeInSeconds);
         element.click();
         return element;
+    }
+
+    private WebElement waitForElementAndSendKeys(By by, String error_message, String value, long timeInSeconds) {
+        WebElement element = waitForElementPresent(by, error_message, timeInSeconds);
+        element.sendKeys(value);
+        return element;
+    }
+    private boolean waitForElementNotPresent(By by, String error_message, long timeInSeconds){
+        WebDriverWait wait = new WebDriverWait(driver,timeInSeconds);
+        wait.withMessage(error_message + "\n");
+        return wait.until(ExpectedConditions.invisibilityOfElementLocated(by)
+        );
+
     }
 }
 
