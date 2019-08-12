@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
+import java.util.List;
 
 public class MainTestClass {
 
@@ -93,6 +94,45 @@ public class MainTestClass {
         );
 
 
+    }
+
+    @Test
+    public void testMatchingSearchResultToKeyword() {
+        String word = "Automation";
+
+        waitForElementAndClick(
+                By.id("search_container"),
+                "no search filed found",
+                5
+        );
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "cannot find search field",
+                word,
+                5
+        );
+
+//        for (int i = 1; i < 10; i++) {
+//            waitForElementPresent(
+//                    By.xpath("//android.widget.ListView/android.widget.LinearLayout[" + i + "]//*[contains(@text,'" + word + "')]"),
+//                    "Search title # " + i + " doesn't contain keyword " + word,
+//                    5);
+//
+//
+//        }
+//
+        waitForElementPresent(By.id("page_list_item_title"), "element not shown", 5);
+        List<WebElement> resultsList = driver.findElements(By.id("page_list_item_title"));
+
+
+        for (int i = 0; i < resultsList.size(); i++) {
+            WebElement element=resultsList.get(i);
+            System.out.println("text= " + element.getText());
+            Assert.assertTrue("element with text: " + element.getText() + " doesnt contain text: " + word + " with number " + i
+                    , element.getText().contains("1"));
+        }
+
 
     }
 
@@ -114,12 +154,14 @@ public class MainTestClass {
         element.sendKeys(value);
         return element;
     }
-    private boolean waitForElementNotPresent(By by, String error_message, long timeInSeconds){
-        WebDriverWait wait = new WebDriverWait(driver,timeInSeconds);
+
+    private boolean waitForElementNotPresent(By by, String error_message, long timeInSeconds) {
+        WebDriverWait wait = new WebDriverWait(driver, timeInSeconds);
         wait.withMessage(error_message + "\n");
         return wait.until(ExpectedConditions.invisibilityOfElementLocated(by)
         );
-
     }
+
+    //  private WebElement waitForElementAndCompare(By by, String error_message, )
 }
 
