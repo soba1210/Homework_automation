@@ -130,7 +130,7 @@ public class MainTestClass {
             WebElement element=resultsList.get(i);
             System.out.println("text= " + element.getText());
             Assert.assertTrue("element with text: " + element.getText() + " doesnt contain text: " + word + " with number " + i
-                    , element.getText().contains("1"));
+                    , element.getText().contains(word));
         }
 
 
