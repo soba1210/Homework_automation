@@ -1,5 +1,7 @@
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.touch.offset.PointOption;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,6 +14,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
 import java.util.List;
+
+import static io.appium.java_client.touch.WaitOptions.waitOptions;
+import static java.time.Duration.ofSeconds;
 
 public class MainTestClass {
 
@@ -27,7 +32,7 @@ public class MainTestClass {
         capabilities.setCapability("automationName", "Appium");
         capabilities.setCapability("appPackage", "org.wikipedia");
         capabilities.setCapability("appActivity", ".main.MainActivity");
-        capabilities.setCapability("app", "/Users/siinc/Desktop/JavaAppiumAutomation/JavaAppiumAutomation/apk/org.wikipedia.apk");
+        // capabilities.setCapability("app", "/Users/siinc/Desktop/JavaAppiumAutomation/JavaAppiumAutomation/apk/org.wikipedia.apk");
 
         driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
 
@@ -127,7 +132,7 @@ public class MainTestClass {
 
 
         for (int i = 0; i < resultsList.size(); i++) {
-            WebElement element=resultsList.get(i);
+            WebElement element = resultsList.get(i);
             System.out.println("text= " + element.getText());
             Assert.assertTrue("element with text: " + element.getText() + " doesnt contain text: " + word + " with number " + i
                     , element.getText().contains(word));
@@ -135,6 +140,172 @@ public class MainTestClass {
 
 
     }
+
+
+    @Test
+    public void savingTwoArticlesInReadingList() {
+        String name_of_list = "Island";
+        String first_search_request = "Java";
+        String subtitle_of_first_article = "Island of Indonesia";
+        String second_search_request = "Appium";
+        waitForElementAndClick(
+                By.id("search_container"),
+                "search field not found",
+                6
+        );
+
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "keyword 'Java' not found",
+                first_search_request,
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='"+subtitle_of_first_article+"']"),
+                "Island of Indonesia not found",
+                6
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@content-desc='More options']"),
+                "Options not found",
+                12
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='Add to reading list']"),
+                "Button 'Add to reading list' not found",
+                5
+        );
+
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='GOT IT']"),
+                "Button 'GOT IT' not found",
+                3
+        );
+
+        waitForElementAndClear(
+                By.id("text_input"),
+                "Field with text input not found",
+                5
+        );
+
+
+        waitForElementAndSendKeys(
+                By.id("text_input"),
+                "Field with text input not found",
+                name_of_list,
+                5
+        );
+
+        waitForElementAndClick(
+                By.id("android:id/button1"),
+                "Button 'OK' not found",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@content-desc='Navigate up']"),
+                "Close button not found(button that closing the article)",
+                5
+        );
+
+        waitForElementAndClick(
+                By.id("search_container"),
+                "search field not found",
+                6
+        );
+
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "keyword '"+second_search_request+"' not found",
+                second_search_request,
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='"+second_search_request+"']"),
+                second_search_request+" article not found",
+                6
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@content-desc='More options']"),
+                "Options not found",
+                12
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='Add to reading list']"),
+                "Button 'Add to reading list' not found",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='" + name_of_list + "']"),
+                "List with title " + name_of_list + " not found",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@content-desc='Navigate up']"),
+                //     By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
+                "Close button not found(button that closing the article)",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@content-desc='My lists']"),
+                "Button 'My lists' not found",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='" + name_of_list + "']"),
+                "List with title " + name_of_list + " not found",
+                5
+        );
+
+        swipeElementToLeft(
+                By.xpath("//*[@class='android.widget.FrameLayout'][@index='2']"),
+                subtitle_of_first_article + " not found in My reading lists");
+
+        waitForElementNotPresent(
+                By.xpath("//*[@text='"+subtitle_of_first_article+"']"),
+                "island of Indonesia in my list still present after deleting",
+                5
+        );
+
+        waitForElementPresent(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='"+second_search_request+"']"),
+                "Article with title 'Appium' not found in Reading list",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='"+second_search_request+"']"),
+                "Appium article in my reading list not found",
+                6
+        );
+
+        String article_title = waitForElementAndGetArticleTitle(
+                By.id("view_page_title_text"),
+                "text",
+                "cannot find article title",
+                5
+        );
+
+        Assert.assertEquals(
+                "Article title after entering from 'My reading list' differs from original article title ",
+                second_search_request,
+                article_title);
+
+
+    }
+
+
 
 
     private WebElement waitForElementPresent(By by, String error_message, long timeInSeconds) {
@@ -162,6 +333,38 @@ public class MainTestClass {
         );
     }
 
-    //  private WebElement waitForElementAndCompare(By by, String error_message, )
+    private WebElement waitForElementAndClear(By by, String error_message, long timeInSeconds) {
+        WebElement element = waitForElementPresent(by, error_message, timeInSeconds);
+        element.clear();
+        return element;
+    }
+
+    protected void swipeElementToLeft(By by, String error_message){
+        WebElement element = waitForElementPresent(
+                by,
+                error_message,
+                7);
+        int left_x = element.getLocation().getX();
+        int right_x = left_x + element.getSize().getWidth() - 1;
+        int upper_y = element.getLocation().getY();
+        int lower_y = upper_y + element.getSize().getHeight();
+        int middle_y = (upper_y + lower_y)/2;
+
+        TouchAction action = new TouchAction(driver);
+        action
+                .press(new PointOption().withCoordinates(right_x, middle_y))
+                .waitAction(waitOptions(ofSeconds(1)))
+                .moveTo(new PointOption().withCoordinates(left_x, middle_y))
+                .release()
+                .perform();
+
+    }
+
+    private String waitForElementAndGetArticleTitle (By by, String attribute, String error_message, long timeoutInSeconds){
+        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
+        return element.getAttribute(attribute);
+    }
+
+
 }
 
