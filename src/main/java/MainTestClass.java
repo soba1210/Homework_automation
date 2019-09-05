@@ -148,6 +148,7 @@ public class MainTestClass {
         String first_search_request = "Java";
         String subtitle_of_first_article = "Island of Indonesia";
         String second_search_request = "Appium";
+
         waitForElementAndClick(
                 By.id("search_container"),
                 "search field not found",
@@ -306,6 +307,41 @@ public class MainTestClass {
     }
 
 
+    @Test
+    public void testTitlePresent(){
+
+        String search_keyword_request = "Java";
+        String subtitle_of_article = "Island of Indonesia";
+
+        waitForElementAndClick(
+                By.id("search_container"),
+                "search field not found",
+                5
+        );
+
+
+        waitForElementAndSendKeys(
+                By.id("search_src_text"),
+                "keyword 'Java' not found",
+                search_keyword_request,
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='"+subtitle_of_article+"']"),
+                "Island of Indonesia not found",
+                5
+        );
+
+        assertElementPresent(
+                By.id("view_page_title_text"),
+                "Element title not found"
+        );
+
+
+
+    }
+
+
 
 
     private WebElement waitForElementPresent(By by, String error_message, long timeInSeconds) {
@@ -363,6 +399,16 @@ public class MainTestClass {
     private String waitForElementAndGetArticleTitle (By by, String attribute, String error_message, long timeoutInSeconds){
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
         return element.getAttribute(attribute);
+    }
+
+    private void assertElementPresent (By by, String error_message) {
+
+       try{
+           waitForElementPresent(by, error_message,0);
+       } catch (Exception e) {
+        throw new AssertionError(error_message);
+       }
+
     }
 
 
