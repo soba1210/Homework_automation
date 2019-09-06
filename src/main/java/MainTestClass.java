@@ -47,12 +47,12 @@ public class MainTestClass {
 
 
     @Before
-    public void setPortait(){
+    public void setPortait() {
         driver.rotate(ScreenOrientation.PORTRAIT);
     }
 
     @After
-    public void resetAPP(){
+    public void resetAPP() {
         driver.resetApp();
     }
 
@@ -177,7 +177,7 @@ public class MainTestClass {
                 5);
 
         waitForElementAndClick(
-                By.xpath("//*[@text='"+subtitle_of_first_article+"']"),
+                By.xpath("//*[@text='" + subtitle_of_first_article + "']"),
                 "Island of Indonesia not found",
                 6
         );
@@ -236,13 +236,13 @@ public class MainTestClass {
 
         waitForElementAndSendKeys(
                 By.id("search_src_text"),
-                "keyword '"+second_search_request+"' not found",
+                "keyword '" + second_search_request + "' not found",
                 second_search_request,
                 5);
 
         waitForElementAndClick(
-                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='"+second_search_request+"']"),
-                second_search_request+" article not found",
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='" + second_search_request + "']"),
+                second_search_request + " article not found",
                 6
         );
 
@@ -283,24 +283,32 @@ public class MainTestClass {
                 5
         );
 
+//        Тесты с коллекцией, не хочу удалять, пригодятся заметки
+//        waitForElementPresent(By.id("org.wikipedia:id/page_list_item_container"),"dsdd",30);
+//        List<WebElement> k = driver.findElements(By.id("org.wikipedia:id/page_list_item_container"));
+//
+////        System.out.println(k);
+//        System.out.println(k.size());
+//        swipeToLeftByElement(k.get(1),"fgfgfgfgf");
+
         swipeElementToLeft(
-                By.xpath("//*[@class='android.widget.FrameLayout'][@index='2']"),
+                By.xpath("(//*[@resource-id='org.wikipedia:id/page_list_item_container'])[2]"), //Подправил Xpath, предыдущий не совсем корректно обтрабатывал
                 subtitle_of_first_article + " not found in My reading lists");
 
         waitForElementNotPresent(
-                By.xpath("//*[@text='"+subtitle_of_first_article+"']"),
+                By.xpath("//*[@text='" + subtitle_of_first_article + "']"),
                 "island of Indonesia in my list still present after deleting",
                 5
         );
 
         waitForElementPresent(
-                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='"+second_search_request+"']"),
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='" + second_search_request + "']"),
                 "Article with title 'Appium' not found in Reading list",
                 5
         );
 
         waitForElementAndClick(
-                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='"+second_search_request+"']"),
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_title'][@text='" + second_search_request + "']"),
                 "Appium article in my reading list not found",
                 6
         );
@@ -322,7 +330,7 @@ public class MainTestClass {
 
 
     @Test
-    public void testTitlePresent(){
+    public void testTitlePresent() {
 
         String search_keyword_request = "Java";
         String subtitle_of_article = "Island of Indonesia";
@@ -341,7 +349,7 @@ public class MainTestClass {
                 5);
 
         waitForElementAndClick(
-                By.xpath("//*[@text='"+subtitle_of_article+"']"),
+                By.xpath("//*[@text='" + subtitle_of_article + "']"),
                 "Island of Indonesia not found",
                 5
         );
@@ -352,16 +360,13 @@ public class MainTestClass {
         );
 
 
-
     }
-
-
 
 
     private WebElement waitForElementPresent(By by, String error_message, long timeInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeInSeconds);
         wait.withMessage(error_message + "\n");
-        return wait.until(ExpectedConditions.presenceOfElementLocated(by));
+        return wait.until(ExpectedConditions.elementToBeClickable(by));
     }
 
     private WebElement waitForElementAndClick(By by, String error_message, long timeInSeconds) {
@@ -389,7 +394,7 @@ public class MainTestClass {
         return element;
     }
 
-    protected void swipeElementToLeft(By by, String error_message){
+    protected void swipeElementToLeft(By by, String error_message) {
         WebElement element = waitForElementPresent(
                 by,
                 error_message,
@@ -398,7 +403,7 @@ public class MainTestClass {
         int right_x = left_x + element.getSize().getWidth() - 1;
         int upper_y = element.getLocation().getY();
         int lower_y = upper_y + element.getSize().getHeight();
-        int middle_y = (upper_y + lower_y)/2;
+        int middle_y = (upper_y + lower_y) / 2;
 
         TouchAction action = new TouchAction(driver);
         action
@@ -410,18 +415,39 @@ public class MainTestClass {
 
     }
 
-    private String waitForElementAndGetArticleTitle (By by, String attribute, String error_message, long timeoutInSeconds){
+    protected void swipeToLeftByElement(WebElement element, String error_message) {     // Тест с коллекцией. Не удяляю, пригодится заметка для себя
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.withMessage(error_message + "\n");
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+
+        int left_x = element.getLocation().getX();
+        int right_x = left_x + element.getSize().getWidth() - 1;
+        int upper_y = element.getLocation().getY();
+        int lower_y = upper_y + element.getSize().getHeight();
+        int middle_y = (upper_y + lower_y) / 2;
+
+        TouchAction action = new TouchAction(driver);
+        action
+                .press(new PointOption().withCoordinates(right_x, middle_y))
+                .waitAction(waitOptions(ofSeconds(1)))
+                .moveTo(new PointOption().withCoordinates(left_x, middle_y))
+                .release()
+                .perform();
+
+    }
+
+    private String waitForElementAndGetArticleTitle(By by, String attribute, String error_message, long timeoutInSeconds) {
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
         return element.getAttribute(attribute);
     }
 
-    private void assertElementPresent (By by, String error_message) {
+    private void assertElementPresent(By by, String error_message) {
 
-       try{
-           waitForElementPresent(by, error_message,0);
-       } catch (Exception e) {
-        throw new AssertionError(error_message);
-       }
+        try {
+            waitForElementPresent(by, error_message, 0);
+        } catch (Exception e) {
+            throw new AssertionError(error_message);
+        }
 
     }
 
